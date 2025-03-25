@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { RouteUrl } from "./RouteUrl";
+import { RouteUrl } from "../src/RouteUrl";
 
 describe("RouteUrl", () => {
   test("initializes with default path", () => {
