@@ -2,7 +2,7 @@ import { resolveUrl } from "./resolveUrl";
 
 type TrailingSlash = "ignore" | "require" | "forbid";
 
-interface RouteUrlOptions {
+export interface RouteUrlOptions {
   hashRouting?: boolean;
   baseUrl?: string;
   relativeUrls?: boolean;
@@ -14,14 +14,14 @@ interface RouteUrlObserver {
 }
 
 export class RouteUrl {
-  private hashRouting: boolean;
-  private baseUrl: string;
-  private relativeUrls: boolean;
-  private trailingSlash: TrailingSlash;
-  private listeners: RouteUrlObserver[];
-  private historyStack: URL[];
-  private currentIndex: number;
-  private currentUrl: URL;
+  protected hashRouting: boolean;
+  protected baseUrl: string;
+  protected relativeUrls: boolean;
+  protected trailingSlash: TrailingSlash;
+  protected listeners: RouteUrlObserver[];
+  protected historyStack: URL[];
+  protected currentIndex: number;
+  protected currentUrl: URL;
 
   constructor({
     hashRouting = false,
@@ -53,9 +53,10 @@ export class RouteUrl {
     });
   }
 
-  setUrl(url: string): void {
+  setUrl(url: string | URL): void {
     // Handle hash fragments and baseUrl normalization
-    const [pathWithoutHash, _hashFragment] = url.split("#");
+    const urlString = url instanceof URL ? url.toString() : url;
+    const [pathWithoutHash, _hashFragment] = urlString.split("#");
     const newUrl = this.resolveUrl(pathWithoutHash);
 
     // If hash routing is enabled, remove hash from URL
@@ -180,5 +181,8 @@ export class RouteUrl {
 
   dispose(): void {
     this.listeners = [];
+    this.historyStack = [];
+    this.currentIndex = -1;
+    this.currentUrl = this._getPlatformUrl();
   }
 }
