@@ -175,7 +175,7 @@ export class RouteUrl {
     }
   }
 
-  private _getPlatformUrl(): URL {
+  protected _getPlatformUrl(): URL {
     return new URL("/", "http://localhost");
   }
 

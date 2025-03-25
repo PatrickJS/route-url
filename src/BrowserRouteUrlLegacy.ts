@@ -16,10 +16,13 @@ export class BrowserRouteUrlLegacy extends RouteUrl {
   navigate(path: string): boolean {
     const url = this.resolveUrl(path);
     if (!this.canNavigate(url)) return false;
+    const pathWithoutBase = url.pathname.startsWith(this.baseUrl)
+      ? url.pathname.slice(this.baseUrl.length) || "/"
+      : url.pathname;
     history.pushState(
       {},
       "",
-      this.hashRouting ? `#${url.pathname}` : url.pathname
+      this.hashRouting ? `#${pathWithoutBase}` : pathWithoutBase
     );
     this.setUrl(url);
     return true;
@@ -28,13 +31,24 @@ export class BrowserRouteUrlLegacy extends RouteUrl {
   replace(path: string): boolean {
     const url = this.resolveUrl(path);
     if (!this.canNavigate(url)) return false;
+    const pathWithoutBase = url.pathname.startsWith(this.baseUrl)
+      ? url.pathname.slice(this.baseUrl.length) || "/"
+      : url.pathname;
     history.replaceState(
       {},
       "",
-      this.hashRouting ? `#${url.pathname}` : url.pathname
+      this.hashRouting ? `#${pathWithoutBase}` : pathWithoutBase
     );
     this.setUrl(url);
     return true;
+  }
+
+  back(): void {
+    window.history.back();
+  }
+
+  forward(): void {
+    window.history.forward();
   }
 
   protected getPlatformUrl(): URL {

@@ -13,12 +13,18 @@ export class BrowserRouteUrlNavigate extends RouteUrl {
 
   navigate(path: string): void {
     const url = this.resolveUrl(path);
-    window.navigation.navigate(url.pathname, { history: "push" });
+    const pathWithoutBase = url.pathname.startsWith(this.baseUrl)
+      ? url.pathname.slice(this.baseUrl.length) || "/"
+      : url.pathname;
+    window.navigation.navigate(pathWithoutBase, { history: "push" });
   }
 
   replace(path: string): void {
     const url = this.resolveUrl(path);
-    window.navigation.navigate(url.pathname, { history: "replace" });
+    const pathWithoutBase = url.pathname.startsWith(this.baseUrl)
+      ? url.pathname.slice(this.baseUrl.length) || "/"
+      : url.pathname;
+    window.navigation.navigate(pathWithoutBase, { history: "replace" });
   }
 
   protected getPlatformUrl(): URL {
