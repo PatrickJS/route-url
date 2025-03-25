@@ -5,8 +5,9 @@ Minimal, observable-based URL management library supporting browser, server, and
 
 ```bash
 npm install
-
 ```
+
+```bash
 route-url/
 ├── src/
 │   ├── RouteUrl.js
