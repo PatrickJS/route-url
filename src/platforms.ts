@@ -19,8 +19,3 @@ export function createRouteUrl({
     ? new BrowserRouteUrlNavigate(options)
     : new BrowserRouteUrlLegacy(options);
 }
-
-export { BrowserRouteUrlLegacy } from "./BrowserRouteUrlLegacy.js";
-export { BrowserRouteUrlNavigate } from "./BrowserRouteUrlNavigate.js";
-export { ServerRouteUrl } from "./ServerRouteUrl.js";
-export { InMemoryRouteUrl } from "./InMemoryRouteUrl.js";
