@@ -68,7 +68,8 @@ router.subscribe((routeUrl) => {
 router.navigate('/users/123');
 
 // Extract route parameters
-const params = router.getParams('/users/:id');
+const routeUrl = router.createRouteUrl();
+const params = routeUrl.getParams('/users/:id');
 console.log(params.id); // "123"
 
 // Handle specific routes
@@ -96,11 +97,13 @@ router.when('/dashboard').subscribe((routeUrl) => {
   ```typescript
   // Without baseUrl
   router.setUrl('/users/123');
+  const routeUrl = router.createRouteUrl();
   routeUrl.getPath(); // "/users/123"
   routeUrl.getPath(false); // "/users/123"
 
   // With baseUrl: '/api'
   router.setUrl('/api/users/123');
+  const routeUrl = router.createRouteUrl();
   routeUrl.getPath(); // "/users/123" (default: removeBasePath = true)
   routeUrl.getPath(false); // "/api/users/123" (keep baseUrl)
   ```
@@ -108,6 +111,7 @@ router.when('/dashboard').subscribe((routeUrl) => {
 - `getParams(pattern: string)`: Extract route parameters
   ```typescript
   router.setUrl('/users/123/posts/456');
+  const routeUrl = router.createRouteUrl();
   const params = routeUrl.getParams('/users/:userId/posts/:postId');
   // { userId: "123", postId: "456" }
   ```
@@ -116,11 +120,13 @@ router.when('/dashboard').subscribe((routeUrl) => {
   ```typescript
   // Without baseUrl
   router.setUrl('/users?page=1&limit=10');
+  const routeUrl = router.createRouteUrl();
   routeUrl.getQuery().get('page'); // "1"
   routeUrl.getQuery().get('limit'); // "10"
 
   // With baseUrl: '/api'
   router.setUrl('/api/users?page=1&limit=10');
+  const routeUrl = router.createRouteUrl();
   routeUrl.getQuery().get('page'); // "1"
   routeUrl.getQuery().get('limit'); // "10"
   ```
