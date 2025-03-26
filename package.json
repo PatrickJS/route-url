@@ -4,9 +4,14 @@
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "test": "vitest",
-    "build": "tsc"
+    "clean": "rm -rf dist",
+    "build": "npm run clean && tsc",
+    "prepublishOnly": "npm run build"
   },
   "devDependencies": {
     "@types/node": "^20.11.19",
@@ -16,5 +21,13 @@
   },
   "dependencies": {
     "jsdom": "26.0.0"
-  }
+  },
+  "keywords": [
+    "routing",
+    "url",
+    "browser",
+    "typescript"
+  ],
+  "author": "github@patrickjs.com",
+  "license": "MIT"
 }
