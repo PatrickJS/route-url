@@ -1,5 +1,8 @@
 import { RouteUrl, type RouteUrlOptions } from "./RouteUrl.js";
-import type { NavigateEvent } from "./types/navigation.js";
+import type {
+  NavigateEvent,
+  NavigationResult,
+} from "./types/navigation-events";
 
 export class BrowserRouteUrlNavigate extends RouteUrl {
   private boundOnNavigate: (event: NavigateEvent) => void;
@@ -11,20 +14,24 @@ export class BrowserRouteUrlNavigate extends RouteUrl {
     this.setUrl(this.getPlatformUrl());
   }
 
-  navigate(path: string): void {
+  navigate(path: string): NavigationResult {
     const url = this.resolveUrl(path);
     const pathWithoutBase = url.pathname.startsWith(this.baseUrl)
       ? url.pathname.slice(this.baseUrl.length) || "/"
       : url.pathname;
-    window.navigation.navigate(pathWithoutBase, { history: "push" });
+    return window.navigation.navigate(pathWithoutBase, {
+      history: "push",
+    }) as unknown as NavigationResult;
   }
 
-  replace(path: string): void {
+  replace(path: string): NavigationResult {
     const url = this.resolveUrl(path);
     const pathWithoutBase = url.pathname.startsWith(this.baseUrl)
       ? url.pathname.slice(this.baseUrl.length) || "/"
       : url.pathname;
-    window.navigation.navigate(pathWithoutBase, { history: "replace" });
+    return window.navigation.navigate(pathWithoutBase, {
+      history: "replace",
+    }) as unknown as NavigationResult;
   }
 
   protected getPlatformUrl(): URL {
