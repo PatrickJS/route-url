@@ -158,8 +158,8 @@ describe("Platform-specific RouteUrl implementations", () => {
     });
 
     it("does not maintain history stack on server", () => {
-      routeUrl.setUrl("/api/page1");
-      routeUrl.setUrl("/api/page2");
+      routeUrl.navigate("/api/page1");
+      routeUrl.navigate("/api/page2");
       routeUrl.back();
       expect(routeUrl.getPath()).toBe("/page2/");
     });
@@ -173,10 +173,10 @@ describe("Platform-specific RouteUrl implementations", () => {
     });
 
     it("handles in-memory navigation", () => {
-      routeUrl.setUrl("/dashboard");
+      routeUrl.navigate("/dashboard");
       expect(routeUrl.getPath()).toBe("/dashboard");
 
-      routeUrl.setUrl("/profile");
+      routeUrl.navigate("/profile");
       expect(routeUrl.getPath()).toBe("/profile");
 
       routeUrl.back();
@@ -184,9 +184,9 @@ describe("Platform-specific RouteUrl implementations", () => {
     });
 
     it("maintains history stack correctly", () => {
-      routeUrl.setUrl("/page1");
-      routeUrl.setUrl("/page2");
-      routeUrl.setUrl("/page3");
+      routeUrl.navigate("/page1");
+      routeUrl.navigate("/page2");
+      routeUrl.navigate("/page3");
 
       expect(routeUrl.getPath()).toBe("/page3");
       routeUrl.back();

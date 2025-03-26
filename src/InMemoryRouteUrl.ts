@@ -18,7 +18,7 @@ export class InMemoryRouteUrl extends RouteUrl {
   }
 
   navigate(path: string): void {
-    this.setUrl(this.resolveUrl(path));
+    this.setUrl(path);
   }
 
   replace(path: string): void {
