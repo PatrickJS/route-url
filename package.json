@@ -1,9 +1,29 @@
 {
   "name": "route-url",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./browser": {
+      "types": "./dist/BrowserRouteUrlNavigate.d.ts",
+      "import": "./dist/BrowserRouteUrlNavigate.js"
+    },
+    "./browser-legacy": {
+      "types": "./dist/BrowserRouteUrlLegacy.d.ts",
+      "import": "./dist/BrowserRouteUrlLegacy.js"
+    },
+    "./in-memory": {
+      "types": "./dist/InMemoryRouteUrl.d.ts",
+      "import": "./dist/InMemoryRouteUrl.js"
+    },
+    "./server": {
+      "types": "./dist/ServerRouteUrl.d.ts",
+      "import": "./dist/ServerRouteUrl.js"
+    }
+  },
   "files": [
     "dist"
   ],
