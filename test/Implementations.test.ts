@@ -1,12 +1,12 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { RouteUrl } from "../src/RouteUrl";
+import { RouteUrlBase } from "../src/RouteUrl";
 
-describe("RouteUrl Implementation", () => {
+describe("RouteUrlBase Implementation", () => {
   describe("Server", () => {
-    let routeUrl: RouteUrl;
+    let routeUrl: RouteUrlBase;
 
     beforeEach(() => {
-      routeUrl = new RouteUrl({
+      routeUrl = new RouteUrlBase({
         baseUrl: "/api",
         relativeUrls: true,
       });
@@ -14,22 +14,24 @@ describe("RouteUrl Implementation", () => {
 
     it("should handle server-side URLs correctly", () => {
       routeUrl.setUrl("/api/users/123");
-      expect(routeUrl.getPath()).toBe("/users/123");
+      const url = routeUrl.createRouteUrl();
+      expect(url.getPath()).toBe("/users/123");
     });
 
     it("should handle query parameters on server", () => {
       routeUrl.setUrl("/api/users?page=1&limit=10");
-      expect(routeUrl.getPath()).toBe("/users");
-      expect(routeUrl.getQuery().get("page")).toBe("1");
-      expect(routeUrl.getQuery().get("limit")).toBe("10");
+      const url = routeUrl.createRouteUrl();
+      expect(url.getPath()).toBe("/users");
+      expect(url.getQuery().get("page")).toBe("1");
+      expect(url.getQuery().get("limit")).toBe("10");
     });
   });
 
   describe("In-Memory", () => {
-    let routeUrl: RouteUrl;
+    let routeUrl: RouteUrlBase;
 
     beforeEach(() => {
-      routeUrl = new RouteUrl({
+      routeUrl = new RouteUrlBase({
         baseUrl: "",
         relativeUrls: true,
       });
@@ -37,13 +39,16 @@ describe("RouteUrl Implementation", () => {
 
     it("should handle in-memory navigation", () => {
       routeUrl.setUrl("/dashboard");
-      expect(routeUrl.getPath()).toBe("/dashboard");
+      const url1 = routeUrl.createRouteUrl();
+      expect(url1.getPath()).toBe("/dashboard");
 
       routeUrl.setUrl("/profile");
-      expect(routeUrl.getPath()).toBe("/profile");
+      const url2 = routeUrl.createRouteUrl();
+      expect(url2.getPath()).toBe("/profile");
 
       routeUrl.back();
-      expect(routeUrl.getPath()).toBe("/dashboard");
+      const url3 = routeUrl.createRouteUrl();
+      expect(url3.getPath()).toBe("/dashboard");
     });
 
     it("should handle history stack correctly", () => {
@@ -51,18 +56,22 @@ describe("RouteUrl Implementation", () => {
       routeUrl.setUrl("/page2");
       routeUrl.setUrl("/page3");
 
-      expect(routeUrl.getPath()).toBe("/page3");
+      const url1 = routeUrl.createRouteUrl();
+      expect(url1.getPath()).toBe("/page3");
       routeUrl.back();
-      expect(routeUrl.getPath()).toBe("/page2");
+      const url2 = routeUrl.createRouteUrl();
+      expect(url2.getPath()).toBe("/page2");
       routeUrl.back();
-      expect(routeUrl.getPath()).toBe("/page1");
+      const url3 = routeUrl.createRouteUrl();
+      expect(url3.getPath()).toBe("/page1");
       routeUrl.forward();
-      expect(routeUrl.getPath()).toBe("/page2");
+      const url4 = routeUrl.createRouteUrl();
+      expect(url4.getPath()).toBe("/page2");
     });
   });
 
   describe("Browser", () => {
-    let routeUrl: RouteUrl;
+    let routeUrl: RouteUrlBase;
     let originalLocation: Location;
 
     beforeEach(() => {
@@ -76,7 +85,7 @@ describe("RouteUrl Implementation", () => {
         hash: "",
       } as Location;
 
-      routeUrl = new RouteUrl({
+      routeUrl = new RouteUrlBase({
         baseUrl: "/app",
         relativeUrls: true,
       });
@@ -88,51 +97,56 @@ describe("RouteUrl Implementation", () => {
 
     it("should handle browser URLs correctly", () => {
       routeUrl.setUrl("/app/dashboard");
-      expect(routeUrl.getPath()).toBe("/dashboard");
+      const url = routeUrl.createRouteUrl();
+      expect(url.getPath()).toBe("/dashboard");
     });
 
     it("should handle hash routing", () => {
-      const hashRouteUrl = new RouteUrl({
+      const hashRouteUrl = new RouteUrlBase({
         baseUrl: "/app",
         hashRouting: true,
         relativeUrls: true,
       });
 
       hashRouteUrl.setUrl("/app/dashboard#section1");
-      expect(hashRouteUrl.getPath()).toBe("/dashboard");
+      const url = hashRouteUrl.createRouteUrl();
+      expect(url.getPath()).toBe("/dashboard");
     });
 
     it("should handle trailing slashes according to option", () => {
-      const requireSlashUrl = new RouteUrl({
+      const requireSlashUrl = new RouteUrlBase({
         baseUrl: "/app",
         trailingSlash: "require",
         relativeUrls: true,
       });
 
-      const forbidSlashUrl = new RouteUrl({
+      const forbidSlashUrl = new RouteUrlBase({
         baseUrl: "/app",
         trailingSlash: "forbid",
         relativeUrls: true,
       });
 
       requireSlashUrl.setUrl("/app/users");
-      expect(requireSlashUrl.getPath()).toBe("/users/");
+      const url1 = requireSlashUrl.createRouteUrl();
+      expect(url1.getPath()).toBe("/users/");
 
       forbidSlashUrl.setUrl("/app/users/");
-      expect(forbidSlashUrl.getPath()).toBe("/users");
+      const url2 = forbidSlashUrl.createRouteUrl();
+      expect(url2.getPath()).toBe("/users");
     });
   });
 
   describe("Common Functionality", () => {
-    let routeUrl: RouteUrl;
+    let routeUrl: RouteUrlBase;
 
     beforeEach(() => {
-      routeUrl = new RouteUrl();
+      routeUrl = new RouteUrlBase();
     });
 
     it("should handle route parameters", () => {
       routeUrl.setUrl("/users/123/posts/456");
-      const params = routeUrl.getParams("/users/:userId/posts/:postId");
+      const url = routeUrl.createRouteUrl();
+      const params = url.getParams("/users/:userId/posts/:postId");
       expect(params).toEqual({
         userId: "123",
         postId: "456",
@@ -144,7 +158,8 @@ describe("RouteUrl Implementation", () => {
       const subscription = routeUrl.subscribe(mockObserver);
 
       routeUrl.setUrl("/new-path");
-      expect(mockObserver).toHaveBeenCalledWith(routeUrl);
+      const expectedUrl = routeUrl.createRouteUrl();
+      expect(mockObserver).toHaveBeenCalledWith(expectedUrl);
 
       subscription.unsubscribe();
       routeUrl.setUrl("/another-path");
@@ -161,7 +176,8 @@ describe("RouteUrl Implementation", () => {
       expect(mockObserver).not.toHaveBeenCalled();
 
       routeUrl.setUrl("/specific-path");
-      expect(mockObserver).toHaveBeenCalledWith(routeUrl);
+      const expectedUrl = routeUrl.createRouteUrl();
+      expect(mockObserver).toHaveBeenCalledWith(expectedUrl);
 
       subscription.unsubscribe();
     });

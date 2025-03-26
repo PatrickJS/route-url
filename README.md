@@ -72,8 +72,9 @@ const params = router.getParams('/users/:id');
 console.log(params.id); // "123"
 
 // Handle specific routes
-router.when('/dashboard').subscribe(() => {
+router.when('/dashboard').subscribe((routeUrl) => {
   console.log('Dashboard route activated!');
+  console.log('Current path:', routeUrl.getPath());
 });
 ```
 
@@ -81,15 +82,21 @@ router.when('/dashboard').subscribe(() => {
 
 ### Core Methods
 
+#### Router Instance Methods
 - `navigate(path: string)`: Navigate to a new URL
 - `replace(path: string)`: Replace current URL without adding to history
-- `getPath()`: Get current path
-- `getParams(pattern: string)`: Extract route parameters
-- `getQuery()`: Get URL query parameters
+- `createRouteUrl()`: Create a RouteUrl instance with current URL state
 - `subscribe(observer)`: Subscribe to URL changes
 - `when(path: string)`: Subscribe to specific route changes
 - `back()`: Navigate back
 - `forward()`: Navigate forward
+
+#### RouteUrl Instance Methods
+- `getPath()`: Get current path
+- `getParams(pattern: string)`: Extract route parameters
+- `getQuery()`: Get URL query parameters
+- `url`: Get the current URL object
+- `stale`: Check if the URL state is stale (has been updated since creation)
 
 ### Configuration Options
 
@@ -168,12 +175,16 @@ const router = new InMemoryRouteUrl('/');
 
 // Test navigation
 router.navigate('/test');
-console.log(router.getPath()); // "/test"
+const routeUrl = router.createRouteUrl();
+const currentPath = routeUrl.getPath();
+console.log(currentPath); // "/test"
 
 // Test back/forward
 router.navigate('/forward');
 router.back();
-console.log(router.getPath()); // "/test"
+const routeUrl = router.createRouteUrl();
+const currentPath = routeUrl.getPath();
+console.log(currentPath); // "/test"
 ```
 
 ## License

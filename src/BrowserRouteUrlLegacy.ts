@@ -1,6 +1,6 @@
-import { RouteUrl, type RouteUrlOptions } from "./RouteUrl.js";
+import { RouteUrlBase, type RouteUrlOptions } from "./RouteUrl.js";
 
-export class BrowserRouteUrlLegacy extends RouteUrl {
+export class BrowserRouteUrlLegacy extends RouteUrlBase {
   private boundOnPopState: () => void;
 
   constructor(options: RouteUrlOptions = {}) {

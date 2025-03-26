@@ -14,65 +14,20 @@ interface RouteUrlObserver {
 }
 
 export class RouteUrl {
-  protected hashRouting: boolean;
-  protected baseUrl: string;
-  protected relativeUrls: boolean;
-  protected trailingSlash: TrailingSlash;
-  protected listeners: RouteUrlObserver[];
-  protected historyStack: URL[];
-  protected currentIndex: number;
-  protected currentUrl: URL;
+  stale: boolean;
+  private url: URL;
+  private baseUrl: string;
+  private hashRouting: boolean;
 
-  constructor({
-    hashRouting = false,
-    baseUrl = "/",
-    relativeUrls = true,
-    trailingSlash = "ignore",
-  }: RouteUrlOptions = {}) {
+  constructor(url: URL, baseUrl: string, hashRouting: boolean) {
+    this.url = url;
+    this.baseUrl = baseUrl;
     this.hashRouting = hashRouting;
-    // Normalize baseUrl by removing trailing slashes and multiple consecutive slashes
-    this.baseUrl =
-      (baseUrl || "/").replace(/\/+/g, "/").replace(/\/$/, "") || "";
-    this.relativeUrls = relativeUrls;
-    this.trailingSlash = trailingSlash;
-    this.listeners = [];
-    this.historyStack = [];
-    this.currentIndex = -1;
-    this.currentUrl = this._getPlatformUrl();
-  }
-
-  canNavigate(url: URL): boolean {
-    return url.pathname.startsWith(this.baseUrl);
-  }
-
-  resolveUrl(path: string): URL {
-    return resolveUrl(path, {
-      baseUrl: this.baseUrl,
-      relativeUrls: this.relativeUrls,
-      trailingSlash: this.trailingSlash,
-    });
-  }
-
-  setUrl(url: string | URL): void {
-    // Handle hash fragments and baseUrl normalization
-    const urlString = url instanceof URL ? url.toString() : url;
-    const [pathWithoutHash, _hashFragment] = urlString.split("#");
-    const newUrl = this.resolveUrl(pathWithoutHash);
-
-    // If hash routing is enabled, remove hash from URL
-    if (this.hashRouting) {
-      newUrl.hash = "";
-    }
-
-    this.currentUrl = newUrl;
-    this.historyStack = this.historyStack.slice(0, this.currentIndex + 1);
-    this.historyStack.push(this.currentUrl);
-    this.currentIndex++;
-    this.emitChange();
+    this.stale = false;
   }
 
   getPath(): string {
-    const pathname = this.currentUrl.pathname;
+    const pathname = this.url.pathname;
     // Ensure pathname is not encoded
     const decodedPathname = decodeURIComponent(pathname);
     const path = decodedPathname.startsWith(this.baseUrl)
@@ -109,7 +64,86 @@ export class RouteUrl {
   }
 
   getQuery(): URLSearchParams {
-    return this.currentUrl.searchParams;
+    return this.url.searchParams;
+  }
+}
+
+export class RouteUrlBase {
+  protected hashRouting: boolean;
+  protected baseUrl: string;
+  protected relativeUrls: boolean;
+  protected trailingSlash: TrailingSlash;
+  protected listeners: RouteUrlObserver[];
+  protected historyStack: URL[];
+  protected currentIndex: number;
+  protected currentUrl: URL;
+  protected currentRouteUrl: RouteUrl;
+
+  constructor({
+    hashRouting = false,
+    baseUrl = "/",
+    relativeUrls = true,
+    trailingSlash = "ignore",
+  }: RouteUrlOptions = {}) {
+    this.hashRouting = hashRouting;
+    // Normalize baseUrl by removing trailing slashes and multiple consecutive slashes
+    this.baseUrl =
+      (baseUrl || "/").replace(/\/+/g, "/").replace(/\/$/, "") || "";
+    this.relativeUrls = relativeUrls;
+    this.trailingSlash = trailingSlash;
+    this.listeners = [];
+    this.historyStack = [];
+    this.currentIndex = -1;
+    this.currentUrl = this._getPlatformUrl();
+    this.currentRouteUrl = this.createRouteUrl();
+  }
+
+  // Helper to create a RouteUrl instance
+  createRouteUrl(): RouteUrl {
+    return new RouteUrl(this.currentUrl, this.baseUrl, this.hashRouting);
+  }
+
+  // Getters for testing
+  getCurrentUrl(): URL {
+    return this.currentUrl;
+  }
+
+  getBaseUrl(): string {
+    return this.baseUrl;
+  }
+
+  getHashRouting(): boolean {
+    return this.hashRouting;
+  }
+
+  canNavigate(url: URL): boolean {
+    return url.pathname.startsWith(this.baseUrl);
+  }
+
+  resolveUrl(path: string): URL {
+    return resolveUrl(path, {
+      baseUrl: this.baseUrl,
+      relativeUrls: this.relativeUrls,
+      trailingSlash: this.trailingSlash,
+    });
+  }
+
+  setUrl(url: string | URL): void {
+    // Handle hash fragments and baseUrl normalization
+    const urlString = url instanceof URL ? url.toString() : url;
+    const [pathWithoutHash, _hashFragment] = urlString.split("#");
+    const newUrl = this.resolveUrl(pathWithoutHash);
+
+    // If hash routing is enabled, remove hash from URL
+    if (this.hashRouting) {
+      newUrl.hash = "";
+    }
+
+    this.currentUrl = newUrl;
+    this.historyStack = this.historyStack.slice(0, this.currentIndex + 1);
+    this.historyStack.push(this.currentUrl);
+    this.currentIndex++;
+    this.emitChange();
   }
 
   subscribe(observer: RouteUrlObserver | ((routeUrl: RouteUrl) => void)): {
@@ -125,8 +159,15 @@ export class RouteUrl {
   }
 
   emitChange(): void {
+    this.currentRouteUrl.stale = true;
+    const routeUrl = new RouteUrl(
+      this.currentUrl,
+      this.baseUrl,
+      this.hashRouting
+    );
+    this.currentRouteUrl = routeUrl;
     for (const listener of this.listeners) {
-      listener.next(this);
+      listener.next(routeUrl);
     }
   }
 

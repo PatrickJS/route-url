@@ -100,7 +100,7 @@ describe("Platform-specific RouteUrl implementations", () => {
         initialPath: "/api",
       });
       expect(routeUrl).toBeInstanceOf(ServerRouteUrl);
-      expect(routeUrl.getPath()).toBe("/api");
+      expect(routeUrl.createRouteUrl().getPath()).toBe("/api");
     });
 
     it("creates InMemoryRouteUrl when platform is memory", () => {
@@ -109,7 +109,7 @@ describe("Platform-specific RouteUrl implementations", () => {
         initialPath: "/test",
       });
       expect(routeUrl).toBeInstanceOf(InMemoryRouteUrl);
-      expect(routeUrl.getPath()).toBe("/test");
+      expect(routeUrl.createRouteUrl().getPath()).toBe("/test");
     });
 
     it("creates BrowserRouteUrlNavigate when navigation API is available", () => {
@@ -147,21 +147,21 @@ describe("Platform-specific RouteUrl implementations", () => {
 
     it("handles server-side URLs correctly", () => {
       routeUrl.setUrl("/api/users/123");
-      expect(routeUrl.getPath()).toBe("/users/123/");
+      expect(routeUrl.createRouteUrl().getPath()).toBe("/users/123/");
     });
 
     it("handles query parameters on server", () => {
       routeUrl.setUrl("/api/users?page=1&limit=10");
-      expect(routeUrl.getPath()).toBe("/users/");
-      expect(routeUrl.getQuery().get("page")).toBe("1");
-      expect(routeUrl.getQuery().get("limit")).toBe("10");
+      expect(routeUrl.createRouteUrl().getPath()).toBe("/users/");
+      expect(routeUrl.createRouteUrl().getQuery().get("page")).toBe("1");
+      expect(routeUrl.createRouteUrl().getQuery().get("limit")).toBe("10");
     });
 
     it("does not maintain history stack on server", () => {
       routeUrl.navigate("/api/page1");
       routeUrl.navigate("/api/page2");
       routeUrl.back();
-      expect(routeUrl.getPath()).toBe("/page2/");
+      expect(routeUrl.createRouteUrl().getPath()).toBe("/page2/");
     });
   });
 
@@ -174,13 +174,13 @@ describe("Platform-specific RouteUrl implementations", () => {
 
     it("handles in-memory navigation", () => {
       routeUrl.navigate("/dashboard");
-      expect(routeUrl.getPath()).toBe("/dashboard");
+      expect(routeUrl.createRouteUrl().getPath()).toBe("/dashboard");
 
       routeUrl.navigate("/profile");
-      expect(routeUrl.getPath()).toBe("/profile");
+      expect(routeUrl.createRouteUrl().getPath()).toBe("/profile");
 
       routeUrl.back();
-      expect(routeUrl.getPath()).toBe("/dashboard");
+      expect(routeUrl.createRouteUrl().getPath()).toBe("/dashboard");
     });
 
     it("maintains history stack correctly", () => {
@@ -188,13 +188,13 @@ describe("Platform-specific RouteUrl implementations", () => {
       routeUrl.navigate("/page2");
       routeUrl.navigate("/page3");
 
-      expect(routeUrl.getPath()).toBe("/page3");
+      expect(routeUrl.createRouteUrl().getPath()).toBe("/page3");
       routeUrl.back();
-      expect(routeUrl.getPath()).toBe("/page2");
+      expect(routeUrl.createRouteUrl().getPath()).toBe("/page2");
       routeUrl.back();
-      expect(routeUrl.getPath()).toBe("/page1");
+      expect(routeUrl.createRouteUrl().getPath()).toBe("/page1");
       routeUrl.forward();
-      expect(routeUrl.getPath()).toBe("/page2");
+      expect(routeUrl.createRouteUrl().getPath()).toBe("/page2");
     });
   });
 
@@ -277,7 +277,7 @@ describe("Platform-specific RouteUrl implementations", () => {
       };
 
       routeUrl["onNavigate"](navigateEvent as any);
-      expect(routeUrl.getPath()).toBe("/dashboard");
+      expect(routeUrl.createRouteUrl().getPath()).toBe("/dashboard");
     });
 
     it("handles hash routing", () => {

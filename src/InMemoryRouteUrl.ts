@@ -1,6 +1,6 @@
-import { RouteUrl, type RouteUrlOptions } from "./RouteUrl.js";
+import { RouteUrlBase, type RouteUrlOptions } from "./RouteUrl.js";
 
-export class InMemoryRouteUrl extends RouteUrl {
+export class InMemoryRouteUrl extends RouteUrlBase {
   constructor(initialPath: string = "/", options: RouteUrlOptions = {}) {
     super(options);
     this.currentUrl = this.resolveUrl(initialPath);

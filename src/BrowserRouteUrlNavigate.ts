@@ -1,11 +1,11 @@
-import { RouteUrl, type RouteUrlOptions } from "./RouteUrl.js";
+import { RouteUrlBase, type RouteUrlOptions } from "./RouteUrl.js";
 import type {
   NavigateEvent,
   NavigationResult,
 } from "./types/navigation-events";
 import type { Navigation } from "./types/navigation";
 
-export class BrowserRouteUrlNavigate extends RouteUrl {
+export class BrowserRouteUrlNavigate extends RouteUrlBase {
   private boundOnNavigate: (event: NavigateEvent) => void;
 
   constructor(options: RouteUrlOptions = {}) {
