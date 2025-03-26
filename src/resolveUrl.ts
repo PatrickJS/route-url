@@ -49,7 +49,10 @@ export function resolveUrl(path: string, options: ResolveUrlOptions): URL {
 
   for (const segment of segments) {
     if (segment === "..") {
-      resolvedSegments.pop();
+      // Only pop if there are segments to pop
+      if (resolvedSegments.length > 0) {
+        resolvedSegments.pop();
+      }
     } else if (segment !== ".") {
       resolvedSegments.push(segment);
     }
