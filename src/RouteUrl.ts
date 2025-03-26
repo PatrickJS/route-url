@@ -112,7 +112,7 @@ export class RouteUrl {
     return this.currentUrl.searchParams;
   }
 
-  subscribe(observer: RouteUrlObserver | ((url: RouteUrl) => void)): {
+  subscribe(observer: RouteUrlObserver | ((routeUrl: RouteUrl) => void)): {
     unsubscribe: () => void;
   } {
     const listener =
