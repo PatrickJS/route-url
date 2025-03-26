@@ -92,9 +92,39 @@ router.when('/dashboard').subscribe((routeUrl) => {
 - `forward()`: Navigate forward
 
 #### RouteUrl Instance Methods
-- `getPath()`: Get current path
+- `getPath(removeBasePath?: boolean)`: Get current path (strips baseUrl if present)
+  ```typescript
+  // Without baseUrl
+  router.setUrl('/users/123');
+  routeUrl.getPath(); // "/users/123"
+  routeUrl.getPath(false); // "/users/123"
+
+  // With baseUrl: '/api'
+  router.setUrl('/api/users/123');
+  routeUrl.getPath(); // "/users/123" (default: removeBasePath = true)
+  routeUrl.getPath(false); // "/api/users/123" (keep baseUrl)
+  ```
+
 - `getParams(pattern: string)`: Extract route parameters
-- `getQuery()`: Get URL query parameters
+  ```typescript
+  router.setUrl('/users/123/posts/456');
+  const params = routeUrl.getParams('/users/:userId/posts/:postId');
+  // { userId: "123", postId: "456" }
+  ```
+
+- `getQuery()`: Get URL query parameters (strips baseUrl if present)
+  ```typescript
+  // Without baseUrl
+  router.setUrl('/users?page=1&limit=10');
+  routeUrl.getQuery().get('page'); // "1"
+  routeUrl.getQuery().get('limit'); // "10"
+
+  // With baseUrl: '/api'
+  router.setUrl('/api/users?page=1&limit=10');
+  routeUrl.getQuery().get('page'); // "1"
+  routeUrl.getQuery().get('limit'); // "10"
+  ```
+
 - `url`: Get the current URL object
 - `stale`: Check if the URL state is stale (has been updated since creation)
 

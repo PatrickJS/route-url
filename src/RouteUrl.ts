@@ -26,13 +26,16 @@ export class RouteUrl {
     this.stale = false;
   }
 
-  getPath(): string {
+  getPath(removeBasePath: boolean = Boolean(this.baseUrl)): string {
     const pathname = this.url.pathname;
     // Ensure pathname is not encoded
     const decodedPathname = decodeURIComponent(pathname);
-    const path = decodedPathname.startsWith(this.baseUrl)
-      ? decodedPathname.slice(this.baseUrl.length) || "/"
-      : decodedPathname;
+    let path = decodedPathname;
+    if (removeBasePath) {
+      path = decodedPathname.startsWith(this.baseUrl)
+        ? decodedPathname.slice(this.baseUrl.length) || "/"
+        : decodedPathname;
+    }
 
     // Remove query parameters and hash fragment
     const pathWithoutQuery = path.split("?")[0];
